@@ -4,3 +4,4 @@ NWPU-RESISC45/
 venv/
 env/
 
+__pycache__/
