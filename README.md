@@ -98,3 +98,25 @@ combined_loader = get_dataloader(
    ```bash
    pip install -r requirements.txt
    ```
+
+## 4. Model Training & Checkpoints
+
+### Frozen Backbone Baseline (`train_baseline.py`)
+Trains a linear classification head (`nn.Linear(512, 45)`) on top of an ImageNet-pretrained **ResNet-18** with all convolutional backbone weights frozen (`seed=42`, `batch_size=64`, `epochs=25`, `SGD` with `lr=0.001`, `momentum=0.9`, `StepLR` `step_size=7`, `gamma=0.1`).
+
+* **Run Training:**
+  ```bash
+  python train_baseline.py
+  ```
+* **Baseline Results:**
+  * **Best Validation Accuracy:** `78.65%` (Epoch 24, `val_loss=0.8005`)
+  * **Final Training Accuracy:** `80.29%` (`train_loss=0.7830`)
+* **Saved Artifact:** `checkpoints/best_baseline_frozen.pth` (ignored by Git via `.gitignore`)
+
+### Checkpoint Format (For Fine-Tuning & Evaluation)
+All saved `.pth` checkpoints store a standardized dictionary so `evaluate.py` can load any model identically:
+```python
+ckpt = torch.load("checkpoints/best_baseline_frozen.pth", map_location=device)
+model.load_state_dict(ckpt["model_state_dict"])
+```
+* **Keys included:** `epoch`, `model_state_dict`, `val_acc`, `val_loss`, `mode` (`"frozen"` or `"finetuned"`).
